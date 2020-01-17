@@ -6,7 +6,18 @@ Simply speaking, it is training a neural network!
 
 A neaural network: any function that fits some data.
 A single neurons has no advantage over a traditional ML algorithm.
-Therfore, a neural network ocmbines multiple neurons.
+Therfore, a neural network combines multiple neurons.
+
+- *Sequential* defines a sequence of layers in the neural network.
+    The first layer in your network should be the same shape as your data.
+- *Flatten* remembers earlier and turns that into a 1 dimentional set.
+- *Dense* adds a layer of connected neurons.
+- *Loss function* measures how good the current guess is.
+- *Optimizer* generates a new improved guess based on calculated loss.
+- *Activation function* tells each layer of neurons what to do.
+    - *Relu* if X>0 return X, else return 0, so it only passes 0 or greater to the next layers in the network.
+    - *Softmax* takes a set of values and picks the biggest one to save coding.
+
 
 ### Traiditional Neural Network
 - Learn without Persistence.
