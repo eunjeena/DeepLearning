@@ -1,7 +1,15 @@
 '''
 Recurrent Neural Network:
-Give the network a sequence of words and train it to predict the next word
-TODO: Make a class to run all process
+Give the network a sequence of words and train it to predict the next word;
+(1) Clean data using regular expressions
+(2) Prepare data for neural network
+    - convert text to integers (tokenization)
+    - encode labels using one-hot encoding
+    - build training and validation set
+(3) Build a recurrent neural network using LSTM cells
+(4) Use pre-trained word embedding (we can train our own embeddings)
+(5) Adjust model paramaeters to improve performance
+(6) Inspect model results
 '''
 from keras.preprocessing.text import Tokenizer
 import numpy as np
@@ -287,10 +295,10 @@ print("Summary Output Shape Interpretation:")
 print("  >> (batch_size, timesteps(input), features)")
 # NOTE: (batch_size, timesteps(input), features) shape
 # Using pre-trained embeddings lose many words to train --> not good
+model_name = 'pre-trained-rnn'
+model_dir = './models/'
 try:
     from IPython.display import Image
-    model_name = 'pre-trained-rnn'
-    model_dir = './models/'
     plot_model(model,
             to_file=f'{model_dir}{model_name}.png',
             show_shapes=True)
@@ -338,6 +346,7 @@ def load_and_evaluate(model_name, return_model=False):
 model = load_and_evaluate(model_name, return_model=True)
 
 #NOTE: To check how the model compares to just using the word frequencies to make predictions, we can compute the accuracy if we were to use the most frequent word for every quess. We can also choose from a multinomial distribution using the word frequencies as probabilities.
+print('Checking how the model compares to just using the word frequencies to make predictions, we can compute the accuracy if we were to use the most frequent word for every quess...')
 
 np.random.seed(40)
 # number of all words
@@ -350,5 +359,12 @@ frequencies[1:10]
 list(word_to_idx.keys())[0:9]
 print("The most common word is `the`")
 print("See the accuracy of guessing `the` for every validation example...")
-print(f"  >>The accuracy: {round(100 * np.argmax(y_valid, axis=1) == 1),4)}%")
+print(" >> The accuracy is", round(100 * np.mean(np.argmax(y_valid, axis=1), 4)), " %")
 print("Cosine similarity test available with find_closest('query')")
+
+print("")
+print("""
+We can change LSTM Layers #, Bi-directional, training length, pre-trained...
+to see validation log loss, validation accuracy and # words in vocab and
+select the best model
+""")
