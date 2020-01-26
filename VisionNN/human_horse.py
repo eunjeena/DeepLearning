@@ -29,6 +29,9 @@ print("Total training horse images:", len(train_horse_names))
 print("Total training human images:", len(train_human_names))
 
 #%matplotlib inline # for notebook
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+
 '''
 # to display pictures
 import matplotlib.pyplot as plt
@@ -171,15 +174,42 @@ x /= 255
 
 # obtaining all intermediate representations for this image
 successive_feature_maps = visualization_model.predict(x)
-print("successvie_feature_maps:", successive_feature_maps)
+print("successive_feature_maps list length:", len(successive_feature_maps))
 
 # layers name
 layer_names = [layer.name for layer in model.layers]
-print("layers name:", layer_names)
+print("layers name:", layer_names) #['conv2d', 'max_pooling2d', 'conv2d_1', 'max_pooling2d_1', 'conv2d_2', 'max_pooling2d_2', 'conv2d_3', 'max_pooling2d_3', 'flatten', 'dense', 'dense_1']
 
 # display
 for layer_name, feature_map in zip(layer_names, successive_feature_maps):
     if len(feature_map.shape) == 4:
         # just do this for the conv/max pool layers, not fully-connected layers
-        n_features = feature_map.shape[-1]
+        n_features = feature_map.shape[-1] # nums of features in feature map
+        # the feature map has shape( 1, size, size, n_features)
+        size = feature_map.shape[1]
+        display_grid = np.zeros((size, size * n_features))
+        for i in range(n_features):
+            # Postprocess the feature to make it visually palatable
+            x = feature_map[0, :, :, i]
+            x -= x.mean()
+            x /= x.std()
+            x *= 64
+            x += 128
+            x = np.clip(x, 0, 255).astype('uint8')
+            # We'll tile each filter into this big horizontal grid
+            display_grid[:, i * size : (i + 1) * size] = x
+        # Display the grid
+        scale = 20. / n_features
+        plt.figure(figsize=(scale * n_features, scale))
+        plt.title(layer_name)
+        plt.grid(False)
+        plt.imshow(display_grid, aspect='auto', cmap='viridis')
+        plt.show()
+# NOTE:As you can see we go from the raw pixels of the images to increasingly abstract and compact representations. The representations downstream start highlighting what the network pays attention to, and they show fewer and fewer features being "activated"; most are set to zero. This is called "sparsity." Representation sparsity is a key feature of deep learning.
+print("These representations carry increasingly less information about the original pixels of the image, but increasingly refined information about the class of the image. You can think of a convnet (or a deep network in general) as an information distillation pipeline. ")
 
+# clean up to terminate the kernel and free memory resources:
+input_ = input("Termintate the kernel and free memory resource? (y/n):")
+if input_ == "y":
+    import os, signal
+    os.kill(os.getpid(), signal.SIGKILL)
